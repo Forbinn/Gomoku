@@ -11,3 +11,15 @@
 *.lai
 *.la
 *.a
+
+# Compile directory
+.moc
+.obj
+.ui
+
+# Binary
+Gomoku
+
+# QtCreator file
+Gomoku.pro
+Gomoku.pro.user
