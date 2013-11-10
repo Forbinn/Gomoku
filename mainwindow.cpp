@@ -66,7 +66,7 @@ void MainWindow::_frame_mouseClick(QPoint p)
     player->setPieceTaken(player->pieceTaken() + res);
     _frame->update();
 
-    if (_arbiter->hasWin(player))
+    if (_arbiter->hasWin(player, x, y))
     {
         _run = false;
         _ui->labelPlayerTurn->setText("Player " + player->name() + " is the winner");

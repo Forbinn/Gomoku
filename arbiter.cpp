@@ -29,9 +29,41 @@ bool Arbiter::isValid(int x, int y, const Player *p)
     return true;
 }
 
-bool Arbiter::hasWin(const Player *p) const
+bool Arbiter::hasWin(const Player *p, int x, int y) const
 {
     if (p->pieceTaken() >= 10)
         return true;
+
+    if (_check_this_line(x, y, p, 0, -1))
+        return true;
+    else if (_check_this_line(x, y, p, 1, -1))
+        return true;
+    else if (_check_this_line(x, y, p, 1, 0))
+        return true;
+    else if (_check_this_line(x, y, p, 1, 1))
+        return true;
+    else if (_check_this_line(x, y, p, 0, 1))
+        return true;
+    else if (_check_this_line(x, y, p, -1, 1))
+        return true;
+    else if (_check_this_line(x, y, p, -1, 0))
+        return true;
+    else if (_check_this_line(x, y, p, -1, -1))
+        return true;
+
     return false;
+}
+
+bool Arbiter::_check_this_line(int x, int y, const Player *p, int dx, int dy) const
+{
+    for (int i = 0; i < 5; ++i)
+    {
+        if (_frame->getSafePoint(x, y) != p->color())
+            return false;
+
+        x += dx;
+        y += dy;
+    }
+
+    return true;
 }
