@@ -13,7 +13,7 @@ public:
     int change(int x, int y, const Player *p);
 
 private:
-    int _change_color(int x, int y, const Player *p, int dx, int dy);
+    int _check_color(int x, int y, const Player *p, int dx, int dy);
 
 private:
     Frame *_frame;
