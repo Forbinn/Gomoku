@@ -23,6 +23,8 @@ public:
     inline QColor getPoint(int x, int y) const { return _color[x][y]; }
     QColor getSafePoint(int x, int y) const;
 
+    void reset();
+
 protected:
     virtual void paintEvent(QPaintEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);

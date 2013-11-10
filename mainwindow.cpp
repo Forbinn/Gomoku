@@ -9,12 +9,17 @@ MainWindow::MainWindow(QWidget *parent) :
     _player1(new Player("Red", Qt::red)),
     _player2(new Player("Blue", Qt::blue)),
     _changeColor(new ChangeColor(_frame)),
-    _player_turn(false)
+    _player_turn(false),
+    _run(true)
 {
     _ui->setupUi(this);
-    this->setCentralWidget(_frame);
+
+    this->centralWidget()->setLayout(_ui->layout);
+    _ui->layout->addWidget(_frame, 1);
+    _ui->labelPlayerTurn->setText((_player_turn ? _player1->name() : _player2->name()) + " your turn");
 
     QObject::connect(_frame, SIGNAL(mouseClick(QPoint)), this, SLOT(_frame_mouseClick(QPoint)));
+    QObject::connect(_ui->actionNew_game, SIGNAL(triggered()), this, SLOT(_action_New_game_triggered()));
 }
 
 MainWindow::~MainWindow()
@@ -27,6 +32,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::_frame_mouseClick(QPoint p)
 {
+    if (!_run)
+        return ;
+
     this->statusBar()->clearMessage();
 
     float width = _frame->rect().width() / 20.f;
@@ -54,11 +62,31 @@ void MainWindow::_frame_mouseClick(QPoint p)
     }
 
     _frame->setPoint(x, y, player->color());
-    player->setPieceTaken(player->pieceTaken() + _changeColor->change(x, y, player));
+    int res = _changeColor->change(x, y, player);
+    player->setPieceTaken(player->pieceTaken() + res);
     _frame->update();
 
     if (_arbiter->hasWin(player))
-        this->statusBar()->showMessage("Player " + player->name() + " is the winner");
+    {
+        _run = false;
+        _ui->labelPlayerTurn->setText("Player " + player->name() + " is the winner");
+        return ;
+    }
 
     _player_turn = !_player_turn;
+    _ui->labelPlayerTurn->setText((_player_turn ? _player1->name() : _player2->name()) + " your turn");
+
+    this->statusBar()->showMessage(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + "\t" + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
+}
+
+void MainWindow::_action_New_game_triggered()
+{
+    _frame->reset();
+    _player1->setPieceTaken(0);
+    _player2->setPieceTaken(0);
+    _run = true;
+    _player_turn = false;
+
+    this->statusBar()->clearMessage();
+    _ui->labelPlayerTurn->setText((_player_turn ? _player1->name() : _player2->name()) + " your turn");
 }

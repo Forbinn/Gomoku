@@ -28,9 +28,11 @@ private:
     Player *_player2;
     ChangeColor *_changeColor;
     bool _player_turn;
+    bool _run;
 
 private slots:
     void _frame_mouseClick(QPoint p);
+    void _action_New_game_triggered();
 };
 
 #endif // MAINWINDOW_H
