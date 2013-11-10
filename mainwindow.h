@@ -2,15 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMenu>
+#include <QAction>
 
-#include "frame.h"
-#include "player.h"
-#include "arbiter.h"
-#include "changecolor.h"
-
-namespace Ui {
-class MainWindow;
-}
+#include "menu.h"
+#include "game.h"
 
 class MainWindow : public QMainWindow
 {
@@ -21,18 +17,14 @@ public:
     virtual ~MainWindow();
 
 private:
-    Ui::MainWindow *_ui;
-    Frame *_frame;
-    Arbiter *_arbiter;
-    Player *_player1;
-    Player *_player2;
-    ChangeColor *_changeColor;
-    bool _player_turn;
-    bool _run;
+    QMenu *_fileMenu;
+    QAction *_newAction;
+
+    Menu *_menu;
+    Game *_game;
 
 private slots:
-    void _frame_mouseClick(QPoint p);
-    void _action_New_game_triggered();
+    void _menu_playerVsPlayer();
 };
 
 #endif // MAINWINDOW_H

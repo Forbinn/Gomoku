@@ -24,12 +24,16 @@ SOURCES += main.cpp\
     frame.cpp \
     player.cpp \
     arbiter.cpp \
-    changecolor.cpp
+    changecolor.cpp \
+    menu.cpp \
+    game.cpp
 
 HEADERS  += mainwindow.h \
     frame.h \
     player.h \
     arbiter.h \
-    changecolor.h
+    changecolor.h \
+    menu.h \
+    game.h
 
-FORMS    += mainwindow.ui
+FORMS    +=
