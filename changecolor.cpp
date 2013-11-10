@@ -32,6 +32,12 @@ int ChangeColor::_change_color(int x, int y, const Player *p, int dx, int dy)
     int saveX = x;
     int saveY = y;
 
+    if (!_frame->getPoint(x, y).isValid())
+        return 0;
+
+    x += dx;
+    y += dy;
+
     // Search the color of the player
     while (x >= 0 && x < 19 && y >= 0 && y < 19)
     {
