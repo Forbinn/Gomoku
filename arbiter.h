@@ -13,6 +13,7 @@ public:
     virtual ~Arbiter();
 
     bool isValid(int x, int y, const Player *p);
+    bool hasWin(const Player *p) const;
 
     inline QString errorString() const { return _errorString; }
 

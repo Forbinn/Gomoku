@@ -28,3 +28,10 @@ bool Arbiter::isValid(int x, int y, const Player *p)
 
     return true;
 }
+
+bool Arbiter::hasWin(const Player *p) const
+{
+    if (p->pieceTaken() >= 10)
+        return true;
+    return false;
+}

@@ -6,8 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     _ui(new Ui::MainWindow),
     _frame(new Frame(this)),
     _arbiter(new Arbiter(_frame)),
-    _player1(new Player(Qt::red)),
-    _player2(new Player(Qt::blue)),
+    _player1(new Player("Red", Qt::red)),
+    _player2(new Player("Blue", Qt::blue)),
     _changeColor(new ChangeColor(_frame)),
     _player_turn(false)
 {
@@ -56,6 +56,9 @@ void MainWindow::_frame_mouseClick(QPoint p)
     _frame->setPoint(x, y, player->color());
     player->setPieceTaken(player->pieceTaken() + _changeColor->change(x, y, player));
     _frame->update();
+
+    if (_arbiter->hasWin(player))
+        this->statusBar()->showMessage("Player " + player->name() + " is the winner");
 
     _player_turn = !_player_turn;
 }
