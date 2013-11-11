@@ -17,14 +17,14 @@ private:
     QPushButton *_pbPlayerVsPlayer;
     QPushButton *_pbPlayerVsIA;
     QPushButton *_pbSettings;
+    QPushButton *_pbQuit;
     QVBoxLayout *_layV;
-
-private slots:
-    void _pbSettings_clicked();
 
 signals:
     void playerVsPlayer();
     void playerVsIA();
+    void settings();
+    void quit();
 };
 
 #endif // MENU_H
