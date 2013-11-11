@@ -51,24 +51,39 @@ bool Arbiter::_checkThisLine(int x, int y, const Player *p, int dx, int dy) cons
     int minusDx = x;
     int minusDy = y;
     int total = 1;
+    bool check = true;
+    bool checkMinus = true;
 
     for (int i = 0; i < 5; ++i)
     {
-        x += dx;
-        y += dy;
-
-        if (_frame->getSafePoint(x, y) == p->color())
-            ++total;
-
-        minusDx -= dx;
-        minusDy -= dy;
-
-        if (_frame->getSafePoint(minusDx, minusDy) == p->color())
+        if (check)
         {
-            saveX = minusDx; // Save for check if the line is breakable
-            saveY = minusDy; // From the beginning of the line
-            ++total;
+            x += dx;
+            y += dy;
+
+            if (_frame->getSafePoint(x, y) == p->color())
+                ++total;
+            else
+                check = false;
         }
+
+        if (checkMinus)
+        {
+            minusDx -= dx;
+            minusDy -= dy;
+
+            if (_frame->getSafePoint(minusDx, minusDy) == p->color())
+            {
+                saveX = minusDx; // Save for check if the line is breakable
+                saveY = minusDy; // From the beginning of the line
+                ++total;
+            }
+            else
+                checkMinus = false;
+        }
+
+        if (!check && !checkMinus)
+            return total >= 5;
     }
 
     if (total < 5)
