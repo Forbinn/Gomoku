@@ -13,18 +13,15 @@ int ChangeColor::change(int x, int y, const Player *p)
 {
     int res = 0;
 
-    res += _check_color(x, y, p, 0, -1);
-    res += _check_color(x, y, p, 1, -1);
-    res += _check_color(x, y, p, 1, 0);
-    res += _check_color(x, y, p, 1, 1);
-    res += _check_color(x, y, p, 0, 1);
-    res += _check_color(x, y, p, -1, 1);
-    res += _check_color(x, y, p, -1, 0);
-    res += _check_color(x, y, p, -1, -1);
+    for (int i = -1; i <= 1; ++i)
+        for (int j = -1; j <= 1; ++j)
+            if (i != 0 || j != 0)
+                res += _checkColor(x, y, p, i, j);
+
     return res;
 }
 
-int ChangeColor::_check_color(int x, int y, const Player *p, int dx, int dy)
+int ChangeColor::_checkColor(int x, int y, const Player *p, int dx, int dy)
 {
     int saveX = x;
     int saveY = y;

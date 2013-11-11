@@ -26,7 +26,8 @@ SOURCES += main.cpp\
     arbiter.cpp \
     changecolor.cpp \
     menu.cpp \
-    game.cpp
+    game.cpp \
+    settings.cpp
 
 HEADERS  += mainwindow.h \
     frame.h \
@@ -34,6 +35,7 @@ HEADERS  += mainwindow.h \
     arbiter.h \
     changecolor.h \
     menu.h \
-    game.h
+    game.h \
+    settings.h
 
 FORMS    +=
