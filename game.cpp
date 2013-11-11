@@ -2,16 +2,17 @@
 
 #include "game.h"
 
-Game::Game(QWidget *parent) :
+Game::Game(const Settings *settings, QWidget *parent) :
     QWidget(parent),
     _labelPlayerTurn(new QLabel(this)),
+    _pbBackMenu(new QPushButton("< Back to menu", this)),
     _frame(new Frame(this)),
     _layV(new QVBoxLayout(this)),
-    _arbiter(new Arbiter(_frame)),
+    _arbiter(new Arbiter(_frame, settings)),
     _changeColor(new ChangeColor(_frame)),
     _player1(new Player("Red", Qt::red)),
     _player2(new Player("Blue", Qt::blue)),
-    _layHInfo(new QHBoxLayout),
+    _layHInfo(new QHBoxLayout()),
     _labelPieceTaken(new QLabel(this)),
     _labelIllegalOperation(new QLabel(this)),
     _run(true),
@@ -37,6 +38,10 @@ Game::Game(QWidget *parent) :
     _labelPlayerTurn->setText((_playerTurn ? _player1->name() : _player2->name()) + " your turn");
     _labelPieceTaken->setText(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + " - " + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
     _labelIllegalOperation->clear();
+
+    _pbBackMenu->move(5, 5);
+
+    QObject::connect(_pbBackMenu, SIGNAL(clicked()), this, SIGNAL(backToMenu()));
 }
 
 Game::~Game()

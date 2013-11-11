@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QPushButton>
 
 #include "arbiter.h"
 #include "player.h"
@@ -16,7 +17,7 @@ class Game : public QWidget
     Q_OBJECT
 
 public:
-    Game(QWidget *parent = 0);
+    Game(const Settings *settings, QWidget *parent = 0);
     virtual ~Game();
 
 public slots:
@@ -24,6 +25,7 @@ public slots:
 
 private:
     QLabel *_labelPlayerTurn;
+    QPushButton *_pbBackMenu;
     Frame *_frame;
     QVBoxLayout *_layV;
     Arbiter *_arbiter;
@@ -39,6 +41,9 @@ private:
 
 private slots:
     void _frame_mouseClick(QPoint p);
+
+signals:
+    void backToMenu();
 };
 
 #endif // GAME_H
