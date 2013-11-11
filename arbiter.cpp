@@ -83,7 +83,7 @@ bool Arbiter::_checkThisLine(int x, int y, const Player *p, int dx, int dy) cons
         }
 
         if (!check && !checkMinus)
-            return total >= 5;
+            break;
     }
 
     if (total < 5)
