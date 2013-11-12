@@ -2,10 +2,13 @@
 #define SETTINGS_H
 
 #include <QWidget>
-#include <QFormLayout>
+#include <QGridLayout>
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QLineEdit>
+
+#include "framecolor.h"
 
 class Settings : public QWidget
 {
@@ -14,8 +17,8 @@ class Settings : public QWidget
 public:
     enum GameType
     {
-        PENTE,
-        GOMOKU_NINUKI
+        PENTE,          // Standard game
+        GOMOKU_NINUKI   // Additional rules
     };
 
 public:
@@ -23,12 +26,22 @@ public:
     virtual ~Settings();
 
     inline GameType gameType() const { return _gameType; }
+    inline QString player1Name() const { return _player1Name; }
+    inline QString player2Name() const { return _player2Name; }
+    inline QColor colorPlayer1() const { return _frameColor1->color(); }
+    inline QColor colorPlayer2() const { return _frameColor2->color(); }
 
 private:
-    QFormLayout *_layF;
+    QGridLayout *_layG;
     QComboBox *_cbGameMode;
     QVBoxLayout *_layV;
     QDialogButtonBox *_buttonBox;
+    QString _player1Name;
+    QString _player2Name;
+    QLineEdit *_lePlayer1Name;
+    QLineEdit *_lePlayer2Name;
+    FrameColor *_frameColor1;
+    FrameColor *_frameColor2;
 
     GameType _gameType;
 

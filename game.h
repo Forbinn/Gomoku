@@ -26,15 +26,17 @@ public slots:
 private:
     QLabel *_labelPlayerTurn;
     QPushButton *_pbBackMenu;
-    Frame *_frame;
     QVBoxLayout *_layV;
+    QHBoxLayout *_layHInfo;
+    QLabel *_labelPieceTaken;
+    QLabel *_labelIllegalOperation;
+
+    Frame *_frame;
     Arbiter *_arbiter;
     ChangeColor *_changeColor;
     Player *_player1;
     Player *_player2;
-    QHBoxLayout *_layHInfo;
-    QLabel *_labelPieceTaken;
-    QLabel *_labelIllegalOperation;
+    const Settings *_settings;
 
     bool _run;
     bool _playerTurn;

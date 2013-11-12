@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     changecolor.cpp \
     menu.cpp \
     game.cpp \
-    settings.cpp
+    settings.cpp \
+    framecolor.cpp
 
 HEADERS  += mainwindow.h \
     frame.h \
@@ -36,6 +37,7 @@ HEADERS  += mainwindow.h \
     changecolor.h \
     menu.h \
     game.h \
-    settings.h
+    settings.h \
+    framecolor.h
 
 FORMS    +=

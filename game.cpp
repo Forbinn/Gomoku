@@ -6,15 +6,16 @@ Game::Game(const Settings *settings, QWidget *parent) :
     QWidget(parent),
     _labelPlayerTurn(new QLabel(this)),
     _pbBackMenu(new QPushButton("< Back to menu", this)),
-    _frame(new Frame(this)),
     _layV(new QVBoxLayout(this)),
-    _arbiter(new Arbiter(_frame, settings)),
-    _changeColor(new ChangeColor(_frame)),
-    _player1(new Player("Red", Qt::red)),
-    _player2(new Player("Blue", Qt::blue)),
     _layHInfo(new QHBoxLayout()),
     _labelPieceTaken(new QLabel(this)),
     _labelIllegalOperation(new QLabel(this)),
+    _frame(new Frame(this)),
+    _arbiter(new Arbiter(_frame, settings)),
+    _changeColor(new ChangeColor(_frame)),
+    _player1(new Player(settings->player1Name(), Qt::red)),
+    _player2(new Player(settings->player2Name(), Qt::blue)),
+    _settings(settings),
     _run(true),
     _playerTurn(true)
 {
@@ -60,6 +61,10 @@ void Game::reset()
     _playerTurn = true;
     _player1->setPieceTaken(0);
     _player2->setPieceTaken(0);
+    _player1->setName(_settings->player1Name());
+    _player2->setName(_settings->player2Name());
+    _player1->setColor(_settings->colorPlayer1());
+    _player2->setColor(_settings->colorPlayer2());
 
     _labelPlayerTurn->setText((_playerTurn ? _player1->name() : _player2->name()) + " your turn");
     _labelPieceTaken->setText(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + " - " + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
