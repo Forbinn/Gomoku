@@ -2,54 +2,41 @@
 #define SETTINGS_H
 
 #include <QWidget>
-#include <QGridLayout>
-#include <QVBoxLayout>
-#include <QComboBox>
-#include <QDialogButtonBox>
-#include <QLineEdit>
+#include <QSettings>
 
-#include "framecolor.h"
+#include "ui_settings.h"
 
-class Settings : public QWidget
+class Settings : public QWidget, private Ui::Settings
 {
     Q_OBJECT
-
-public:
-    enum GameType
-    {
-        PENTE,          // Standard game
-        GOMOKU_NINUKI   // Additional rules
-    };
 
 public:
     Settings(QWidget *parent = 0);
     virtual ~Settings();
 
-    inline GameType gameType() const { return _gameType; }
-    inline QString player1Name() const { return _player1Name; }
-    inline QString player2Name() const { return _player2Name; }
-    inline QColor colorPlayer1() const { return _frameColor1->color(); }
-    inline QColor colorPlayer2() const { return _frameColor2->color(); }
+    inline QString namePlayer1() const { return lePlayer1->text(); }
+    inline void setNamePlayer1(const QString &name) { lePlayer1->setText(name); }
+    inline QString namePlayer2() const { return lePlayer2->text(); }
+    inline void setNamePlayer2(const QString &name) { lePlayer2->setText(name); }
 
-private:
-    QGridLayout *_layG;
-    QComboBox *_cbGameMode;
-    QVBoxLayout *_layV;
-    QDialogButtonBox *_buttonBox;
-    QString _player1Name;
-    QString _player2Name;
-    QLineEdit *_lePlayer1Name;
-    QLineEdit *_lePlayer2Name;
-    FrameColor *_frameColor1;
-    FrameColor *_frameColor2;
-
-    GameType _gameType;
+    inline bool breakable5() const { return cbBreakable5->isChecked(); }
+    inline void setBreakable5(bool breakable) { cbBreakable5->setChecked(breakable); }
+    inline bool double3() const { return cbDouble3->isChecked(); }
+    inline void setDouble3(bool double3) { cbDouble3->setChecked(double3); }
 
 private slots:
-    void _buttonBox_clicked(QAbstractButton *button);
+    void buttonBox_clicked(QAbstractButton *button);
+
+private:
+    void _load();
+    void _save();
+
+private:
+    QSettings _settings;
 
 signals:
-    void backToMenu();
+    void cancel();
+    void changed();
 };
 
 #endif // SETTINGS_H

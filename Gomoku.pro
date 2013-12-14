@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2013-11-09T17:10:48
+# Project created by QtCreator 2013-12-11T20:26:45
 #
 #-------------------------------------------------
 
@@ -11,33 +11,34 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Gomoku
 TEMPLATE = app
 
-DESTDIR = ./
-MOC_DIR = .moc/
-OBJECTS_DIR = .obj/
-RCC_DIR = .rcc/
-UI_DIR = .ui/
-UI_HEADERS_DIR = .ui/header/
-UI_SOURCES_DIR = .ui/src/
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    frame.cpp \
+    case.cpp \
     player.cpp \
-    arbiter.cpp \
-    changecolor.cpp \
+    map.cpp \
     menu.cpp \
     game.cpp \
+    gameboard.cpp \
     settings.cpp \
-    framecolor.cpp
+    arbiter.cpp \
+    ai.cpp
 
 HEADERS  += mainwindow.h \
-    frame.h \
+    case.h \
     player.h \
-    arbiter.h \
-    changecolor.h \
+    map.h \
     menu.h \
     game.h \
+    gameboard.h \
     settings.h \
-    framecolor.h
+    arbiter.h \
+    ai.h
 
-FORMS    +=
+FORMS += \
+    menu.ui \
+    game.ui \
+    settings.ui
+
+RESOURCES += \
+    ressource.qrc

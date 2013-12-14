@@ -1,121 +1,105 @@
-#include <QFont>
-
+#include "ai.h"
 #include "game.h"
 
 Game::Game(const Settings *settings, QWidget *parent) :
     QWidget(parent),
-    _labelPlayerTurn(new QLabel(this)),
-    _pbBackMenu(new QPushButton("< Back to menu", this)),
-    _layV(new QVBoxLayout(this)),
-    _layHInfo(new QHBoxLayout()),
-    _labelPieceTaken(new QLabel(this)),
-    _labelIllegalOperation(new QLabel(this)),
-    _frame(new Frame(this)),
-    _arbiter(new Arbiter(_frame, settings)),
-    _changeColor(new ChangeColor(_frame)),
-    _player1(new Player(settings->player1Name(), Qt::red)),
-    _player2(new Player(settings->player2Name(), Qt::blue)),
-    _settings(settings),
-    _run(true),
-    _playerTurn(true)
+    Ui::Game(),
+    _gameboard(new GameBoard(this)),
+    _arbiter(new Arbiter(&_gameboard->map(), settings, this)),
+    _p1(NULL),
+    _p2(NULL),
+    _actuPlayer(NULL),
+    _run(false)
 {
-    _labelPieceTaken->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    _labelIllegalOperation->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    setupUi(this);
 
-    _layHInfo->addWidget(_labelPieceTaken);
-    _layHInfo->addWidget(_labelIllegalOperation);
+    gridLayout->addWidget(_gameboard, 1, 0, 1, -1);
 
-    QFont font(_labelPlayerTurn->font());
-    font.setPixelSize(20);
-
-    _labelPlayerTurn->setAlignment(Qt::AlignCenter);
-    _labelPlayerTurn->setFont(font);
-    _layV->addWidget(_labelPlayerTurn);
-    _layV->addWidget(_frame, 1);
-    _layV->addLayout(_layHInfo);
-
-    QObject::connect(_frame, SIGNAL(mouseClick(QPoint)), this, SLOT(_frame_mouseClick(QPoint)));
-
-    _labelPlayerTurn->setText((_playerTurn ? _player1->name() : _player2->name()) + " your turn");
-    _labelPieceTaken->setText(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + " - " + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
-    _labelIllegalOperation->clear();
-
-    _pbBackMenu->move(5, 5);
-
-    QObject::connect(_pbBackMenu, SIGNAL(clicked()), this, SIGNAL(backToMenu()));
+    QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked(QPoint)));
+    QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
+    QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
 }
 
 Game::~Game()
 {
-    delete _arbiter;
-    delete _changeColor;
-    delete _player1;
-    delete _player2;
+}
+
+void Game::setPlayer1(Player *p1)
+{
+    if (_p1)
+        QObject::disconnect(_p1, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
+
+    _p1 = p1;
+    _gameboard->setPlayer1(p1);
+
+    QObject::connect(_p1, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
+}
+
+void Game::setPlayer2(Player *p2)
+{
+    if (_p2)
+        QObject::disconnect(_p2, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
+
+    _p2 = p2;
+    _gameboard->setPlayer2(p2);
+
+    QObject::connect(_p2, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
 }
 
 void Game::reset()
 {
-    _frame->reset();
+    _actuPlayer = _p1;
 
+    labelPlayerTurn->setText(_actuPlayer->name() + " is your turn");
+    iconPlayer->setPixmap(QPixmap::fromImage(_actuPlayer->image()));
     _run = true;
-    _playerTurn = true;
-    _player1->setPieceTaken(0);
-    _player2->setPieceTaken(0);
-    _player1->setName(_settings->player1Name());
-    _player2->setName(_settings->player2Name());
-    _player1->setColor(_settings->colorPlayer1());
-    _player2->setColor(_settings->colorPlayer2());
-
-    _labelPlayerTurn->setText((_playerTurn ? _player1->name() : _player2->name()) + " your turn");
-    _labelPieceTaken->setText(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + " - " + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
-    _labelIllegalOperation->clear();
+    _gameboard->reset();
 }
 
-void Game::_frame_mouseClick(QPoint p)
+void Game::_switchPlayer()
 {
     if (!_run)
         return ;
 
-    _labelIllegalOperation->clear();
+    _actuPlayer = (_actuPlayer == _p1) ? _p2 : _p1;
+    labelPlayerTurn->setText(_actuPlayer->name() + " is your turn");
+    iconPlayer->setPixmap(QPixmap::fromImage(_actuPlayer->image()));
 
-    float width = _frame->rect().width() / 20.f;
-    float height = _frame->rect().height() / 20.f;
-    p.setX(p.x() - width);
-    p.setY(p.y() - height);
-    float xf = float(p.x()) / width;
-    float yf = float(p.y()) / height;
-
-    int x = xf;
-    int y = yf;
-    float resX = xf - x;
-    float resY = yf - y;
-    if (resX > 0.5f)
-        ++x;
-    if (resY > 0.5f)
-        ++y;
-
-    Player *player = _playerTurn ? _player1 : _player2;
-
-    if (!_arbiter->isValid(x, y, player))
-    {
-        _labelIllegalOperation->setText("Illegal move: " + _arbiter->errorString());
+    AI *ai = qobject_cast<AI*>(_actuPlayer);
+    if (!ai)
         return ;
-    }
 
-    _frame->setPoint(x, y, player->color());
-    int res = _changeColor->change(x, y, player);
-    player->setPieceTaken(player->pieceTaken() + res);
-    _frame->update();
-
-    if (_arbiter->hasWin(player, x, y))
-    {
-        _run = false;
-        _labelPlayerTurn->setText("Player " + player->name() + " is the winner");
-        return ;
-    }
-
-    _playerTurn = !_playerTurn;
-    _labelPlayerTurn->setText((_playerTurn ? _player1->name() : _player2->name()) + " your turn");
-    _labelPieceTaken->setText(_player1->name() + ": " + QString::number(_player1->pieceTaken()) + " - " + _player2->name() + ": " + QString::number(_player2->pieceTaken()));
+    ai->start();
 }
 
+void Game::_gameboard_mouseClicked(const QPoint &p)
+{
+    if (!_actuPlayer || !_run)
+        return ;
+    if (qobject_cast<AI*>(_actuPlayer))
+        return ;
+
+    int posX = p.x() / _gameboard->caseWidth();
+    int posY = p.y() / _gameboard->caseHeight();
+
+    _player_movePlayed(posX, posY);
+}
+
+void Game::_arbiter_winner(const Player *p)
+{
+    labelPlayerTurn->setText("Player " + p->name() + " is the winner");
+    _run = false;
+}
+
+void Game::_player_movePlayed(int x, int y)
+{
+    if (!_arbiter->setCase(x, y, _actuPlayer))
+    {
+        emit arbiterError(_arbiter->lastErrorString());
+        return ;
+    }
+
+    _gameboard->update();
+    _switchPlayer();
+    emit newMove();
+}

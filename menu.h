@@ -2,10 +2,10 @@
 #define MENU_H
 
 #include <QWidget>
-#include <QPushButton>
-#include <QVBoxLayout>
 
-class Menu : public QWidget
+#include "ui_menu.h"
+
+class Menu : public QWidget, private Ui::Menu
 {
     Q_OBJECT
 
@@ -13,16 +13,9 @@ public:
     Menu(QWidget *parent = 0);
     virtual ~Menu();
 
-private:
-    QPushButton *_pbPlayerVsPlayer;
-    QPushButton *_pbPlayerVsIA;
-    QPushButton *_pbSettings;
-    QPushButton *_pbQuit;
-    QVBoxLayout *_layV;
-
 signals:
     void playerVsPlayer();
-    void playerVsIA();
+    void playerVsAI();
     void settings();
     void quit();
 };

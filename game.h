@@ -2,17 +2,13 @@
 #define GAME_H
 
 #include <QWidget>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
 
-#include "arbiter.h"
+#include "ui_game.h"
+#include "gameboard.h"
 #include "player.h"
-#include "frame.h"
-#include "changecolor.h"
+#include "arbiter.h"
 
-class Game : public QWidget
+class Game : public QWidget, private Ui::Game
 {
     Q_OBJECT
 
@@ -20,32 +16,37 @@ public:
     Game(const Settings *settings, QWidget *parent = 0);
     virtual ~Game();
 
+    inline const Player* player1() const { return _p1; }
+    void setPlayer1(Player *p1);
+    inline const Player* player2() const { return _p2; }
+    void setPlayer2(Player *p2);
+
+    inline const GameBoard* gameBoard() const { return _gameboard; }
+    inline const Arbiter* arbiter() const { return _arbiter; }
+
 public slots:
     void reset();
 
 private:
-    QLabel *_labelPlayerTurn;
-    QPushButton *_pbBackMenu;
-    QVBoxLayout *_layV;
-    QHBoxLayout *_layHInfo;
-    QLabel *_labelPieceTaken;
-    QLabel *_labelIllegalOperation;
+    void _switchPlayer();
 
-    Frame *_frame;
+private:
+    GameBoard *_gameboard;
     Arbiter *_arbiter;
-    ChangeColor *_changeColor;
-    Player *_player1;
-    Player *_player2;
-    const Settings *_settings;
-
+    Player *_p1;
+    Player *_p2;
+    Player *_actuPlayer;
     bool _run;
-    bool _playerTurn;
 
 private slots:
-    void _frame_mouseClick(QPoint p);
+    void _gameboard_mouseClicked(const QPoint &p);
+    void _arbiter_winner(const Player *p);
+    void _player_movePlayed(int x, int y);
 
 signals:
-    void backToMenu();
+    void menu();
+    void arbiterError(const QString &error);
+    void newMove();
 };
 
 #endif // GAME_H

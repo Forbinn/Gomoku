@@ -2,27 +2,43 @@
 #define PLAYER_H
 
 #include <QString>
-#include <QColor>
+#include <QList>
+#include <QImage>
+#include <QObject>
 
-class Player
+class Case;
+
+class Player : public QObject
 {
+    Q_OBJECT
+
 public:
-    Player(QString name, QColor c);
+    Player(const QString &name, const QString &imgPath, QObject *parent = NULL);
     virtual ~Player();
 
-    inline QColor color() const { return _c; }
-    inline void setColor(const QColor &c) { _c = c; }
-
-    inline QString name() const { return _name; }
+    inline const QString& name() const { return _name; }
     inline void setName(const QString &name) { _name = name; }
 
-    inline int pieceTaken() const { return _pieceTaken; }
-    inline void setPieceTaken(int pieceTaken) { _pieceTaken = pieceTaken; }
+    inline int nbCaseOwn() const { return _cases.size(); }
+    inline const QList<const Case*>& caseOwn() const { return _cases; }
+
+    bool addCase(const Case *c);
+    bool removeCase(const Case *c);
+
+    inline const QImage& image() const { return _img; }
+
+    inline int pairTaken() const { return _pairTaken; }
+    inline void addPairTaken(int nb) { _pairTaken += nb; }
+    inline void setPairTaken(int nb) { _pairTaken = nb; }
 
 private:
     QString _name;
-    QColor _c;
-    int _pieceTaken;
+    QList<const Case*> _cases;
+    QImage _img;
+    int _pairTaken;
+
+signals:
+    void movePlayed(int x, int y);
 };
 
 #endif // PLAYER_H

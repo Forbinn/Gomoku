@@ -1,58 +1,77 @@
-#include <QMenuBar>
+#include <QStatusBar>
 
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    _fileMenu(new QMenu("&File", this)),
-    _newAction(NULL),
     _stackedWidget(new QStackedWidget(this)),
+    _p1(new Player("Player 1", ":/image/whiteCoin", this)),
+    _p2(new Player("Player 2", ":/image/blackCoin", this)),
     _settings(new Settings(this)),
     _menu(new Menu(this)),
-    _game(new Game(_settings, this))
+    _game(new Game(_settings, this)),
+    _ai(new AI("AI", ":/image/blackCoin", _game->gameBoard()->map(), _game->arbiter()))
 {
-    _newAction = _fileMenu->addAction("New", _game, SLOT(reset()), QKeySequence::New);
-    _fileMenu->addSeparator();
-    _fileMenu->addAction("Quit", this, SLOT(close()), QKeySequence::Quit);
-    this->menuBar()->addMenu(_fileMenu);
-
     this->setCentralWidget(_stackedWidget);
-    _stackedWidget->addWidget(_game);
+
     _stackedWidget->addWidget(_menu);
+    _stackedWidget->addWidget(_game);
     _stackedWidget->addWidget(_settings);
+
     _stackedWidget->setCurrentWidget(_menu);
 
-    QObject::connect(_menu, SIGNAL(playerVsPlayer()), this, SLOT(_menu_playerVsPlayer()));
-    QObject::connect(_menu, SIGNAL(settings()), this, SLOT(_menu_settings()));
     QObject::connect(_menu, SIGNAL(quit()), this, SLOT(close()));
-    QObject::connect(_game, SIGNAL(backToMenu()), this, SLOT(_backToMenu()));
-    QObject::connect(_settings, SIGNAL(backToMenu()), this, SLOT(_backToMenu()));
-
-    _newAction->setEnabled(false);
+    QObject::connect(_menu, SIGNAL(playerVsPlayer()), this, SLOT(_menu_playerVsPlayer()));
+    QObject::connect(_menu, SIGNAL(playerVsAI()), this, SLOT(_menu_playerVsAI()));
+    QObject::connect(_menu, SIGNAL(settings()), this, SLOT(_menu_settings()));
+    QObject::connect(_game, SIGNAL(menu()), this, SLOT(_goToMenu()));
+    QObject::connect(_game, SIGNAL(arbiterError(QString)), this->statusBar(), SLOT(showMessage(QString)));
+    QObject::connect(_game, SIGNAL(newMove()), this->statusBar(), SLOT(clearMessage()));
+    QObject::connect(_settings, SIGNAL(cancel()), this, SLOT(_goToMenu()));
+    QObject::connect(_settings, SIGNAL(changed()), this, SLOT(_goToMenu()));
 }
 
 MainWindow::~MainWindow()
 {
+    delete _ai;
 }
 
 void MainWindow::_menu_playerVsPlayer()
 {
-    _stackedWidget->setCurrentWidget(_game);
+    _p1->setName(_settings->namePlayer1());
+    _p2->setName(_settings->namePlayer2());
 
-    _newAction->setEnabled(true);
+    _game->setPlayer1(_p1);
+    _game->setPlayer2(_p2);
+
+    _game->reset();
+
+    _stackedWidget->setCurrentWidget(_game);
+}
+
+void MainWindow::_menu_playerVsAI()
+{
+    _p1->setName(_settings->namePlayer1());
+    _ai->setName("AI");
+
+    _game->setPlayer1(_p1);
+    _game->setPlayer2(_ai);
+
+    _game->reset();
+
+    _stackedWidget->setCurrentWidget(_game);
 }
 
 void MainWindow::_menu_settings()
 {
     _stackedWidget->setCurrentWidget(_settings);
-
-    _newAction->setEnabled(false);
 }
 
-void MainWindow::_backToMenu()
+void MainWindow::_goToMenu()
 {
-    _stackedWidget->setCurrentWidget(_menu);
-    _game->reset();
+    if (_ai->isRunning())
+        _ai->stop();
 
-    _newAction->setEnabled(false);
+    this->statusBar()->clearMessage();
+    _stackedWidget->setCurrentWidget(_menu);
 }

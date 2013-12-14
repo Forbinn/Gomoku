@@ -2,13 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMenu>
-#include <QAction>
 #include <QStackedWidget>
 
 #include "menu.h"
 #include "game.h"
+#include "player.h"
 #include "settings.h"
+#include "ai.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,20 +18,20 @@ public:
     MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
+private slots:
+    void _menu_playerVsPlayer();
+    void _menu_playerVsAI();
+    void _menu_settings();
+    void _goToMenu();
+
 private:
-    QMenu *_fileMenu;
-    QAction *_newAction;
-
     QStackedWidget *_stackedWidget;
-
+    Player *_p1;
+    Player *_p2;
     Settings *_settings;
     Menu *_menu;
     Game *_game;
-
-private slots:
-    void _menu_playerVsPlayer();
-    void _menu_settings();
-    void _backToMenu();
+    AI *_ai;
 };
 
 #endif // MAINWINDOW_H

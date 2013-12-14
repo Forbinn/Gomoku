@@ -1,9 +1,10 @@
 #include "arbiter.h"
 
-Arbiter::Arbiter(const Frame *frame, const Settings *settings) :
-    _frame(frame),
-    _settings(settings),
-    _errorString()
+Arbiter::Arbiter(Map *map, const Settings *settings, QObject *parent) :
+    QObject(parent),
+    _errorType(NO_ERROR),
+    _map(map),
+    _settings(settings)
 {
 }
 
@@ -11,128 +12,192 @@ Arbiter::~Arbiter()
 {
 }
 
-bool Arbiter::isValid(int x, int y, const Player *p)
+bool Arbiter::setCase(int x, int y, Player *p)
+{
+    Case &c = _map->get(x, y);
+
+    if (c.isAlreadyTaken())
+    {
+        _errorType = ALREADY_TAKEN;
+        return false;
+    }
+
+    c.setOwner(p);
+    p->addPairTaken(_checkAllPair(x, y, p));
+
+    if (p->pairTaken() >= NB_PAIR_FOR_WINNER)
+        emit winner(p);
+    if (_checkFive(x, y, p))
+        emit winner(p);
+
+    _errorType = NO_ERROR;
+    return true;
+}
+
+bool Arbiter::isValid(int x, int y, const Player *p) const
 {
     Q_UNUSED(p);
+    Case &c = _map->get(x, y);
 
-    if (x < 0 || x > 18 || y < 0 || y > 18)
-    {
-        _errorString = "Move played outside the map";
+    if (c.isAlreadyTaken())
         return false;
-    }
-
-    if (_frame->getPoint(x, y).isValid())
-    {
-        _errorString = "This case is already taken";
-        return false;
-    }
 
     return true;
 }
 
-bool Arbiter::hasWin(const Player *p, int x, int y) const
+QString Arbiter::lastErrorString() const
 {
-    if (p->pieceTaken() >= 10)
-        return true;
+    switch (_errorType)
+    {
+        case NO_ERROR:
+            return "No error encountered";
+        case ALREADY_TAKEN:
+            return "This case is already taken";
+        default:
+            return "Unknow error";
+    }
+}
+
+int Arbiter::_checkAllPair(int x, int y, const Player *p)
+{
+    int pairTaken = 0;
 
     for (int i = -1; i <= 1; ++i)
         for (int j = -1; j <= 1; ++j)
             if (i != 0 || j != 0)
-                if (_checkThisLine(x, y, p, i, j))
-                    return true;
+                if (_checkOnePair(x, y, p, i, j))
+                    ++pairTaken;
 
-    return false;
+    return pairTaken;
 }
 
-bool Arbiter::_checkThisLine(int x, int y, const Player *p, int dx, int dy) const
+bool Arbiter::_checkOnePair(int x, int y, const Player *p, int dx, int dy)
 {
-    int saveX = x;
-    int saveY = y;
-    int minusDx = x;
-    int minusDy = y;
-    int total = 1;
-    bool check = true;
-    bool checkMinus = true;
+    x += dx;
+    y += dy;
 
-    for (int i = 0; i < 5; ++i)
-    {
-        if (check)
-        {
-            x += dx;
-            y += dy;
+    Case &c1 = _map->getSafe(x, y);
 
-            if (_frame->getSafePoint(x, y) == p->color())
-                ++total;
-            else
-                check = false;
-        }
-
-        if (checkMinus)
-        {
-            minusDx -= dx;
-            minusDy -= dy;
-
-            if (_frame->getSafePoint(minusDx, minusDy) == p->color())
-            {
-                saveX = minusDx; // Save for check if the line is breakable
-                saveY = minusDy; // From the beginning of the line
-                ++total;
-            }
-            else
-                checkMinus = false;
-        }
-
-        if (!check && !checkMinus)
-            break;
-    }
-
-    if (total < 5)
-        return false;
-
-    if (_settings->gameType() == Settings::PENTE)
-        return true;
-    else
-        return !_lineIsBreakable(saveX, saveY, p, dx, dy);
-}
-
-bool Arbiter::_lineIsBreakable(int x, int y, const Player *p, int dx, int dy) const
-{
-    for (int i = 0; i < 5; ++i)
-    {
-        for (int j = -1; j <= 1; ++j)
-            for (int k = -1; k <= 1; ++k)
-                if (j != 0 || k != 0)
-                    if (_checkBreakableLine(x, y, p, j, k))
-                        return true;
-
-        x += dx;
-        y += dy;
-    }
-
-    return false;
-}
-
-bool Arbiter::_checkBreakableLine(int x, int y, const Player *p, int dx, int dy) const
-{
-    x -= dx;
-    y -= dy;
-
-    QColor c = _frame->getSafePoint(x, y);
-    if (!c.isValid() || c == p->color())
-        return false;
-
-    x += dx * 2;
-    y += dy * 2;
-
-    c = _frame->getSafePoint(x, y);
-    if (c != p->color())
+    if (!c1.isAlreadyTaken() || c1.isAlreadyTakenBy(p))
         return false;
 
     x += dx;
     y += dy;
 
-    c = _frame->getSafePoint(x, y);
-    if (c.isValid())
+    Case &c2 = _map->getSafe(x, y);
+
+    if (!c2.isAlreadyTaken() || c2.isAlreadyTakenBy(p))
+        return false;
+
+    x += dx;
+    y += dy;
+
+    if (!_map->getSafe(x, y).isAlreadyTakenBy(p))
+        return false;
+
+    c1.clearOwner();
+    c2.clearOwner();
+
+    return true;
+}
+
+bool Arbiter::_checkFive(int x, int y, const Player *p) const
+{
+    for (int i = -1; i <= 1; ++i)
+        for (int j = -1; j <= 1; ++j)
+            if (i != 0 || j != 0)
+                if (_checkFiveOneLine(x, y, p, i, j))
+                {
+                    if (_settings->breakable5())
+                        return _checkLineBreakable(x, y, p, i, j);
+                    return true;
+                }
+
+    return false;
+}
+
+bool Arbiter::_checkFiveOneLine(int x, int y, const Player *p, int dx, int dy) const
+{
+    int nbCoinOwn = 0;
+    int saveX = x;
+    int saveY = y;
+
+    while (_map->getSafe(x, y).isAlreadyTakenBy(p))
+    {
+        x += dx;
+        y += dy;
+        ++nbCoinOwn;
+    }
+
+    if (nbCoinOwn >= 5)
+        return true;
+
+    x = saveX - dx;
+    y = saveY - dy;
+
+    while (_map->getSafe(x, y).isAlreadyTakenBy(p))
+    {
+        x -= dx;
+        y -= dy;
+        ++nbCoinOwn;
+    }
+
+    return nbCoinOwn >= 5;
+}
+
+bool Arbiter::_checkLineBreakable(int x, int y, const Player *p, int dx, int dy) const
+{
+    int pairUnbreakable = 0;
+
+    while (_map->getSafe(x + dx, y + dy).isAlreadyTakenBy(p))
+    {
+        x += dx;
+        y += dy;
+    }
+
+    while (_map->getSafe(x, y).isAlreadyTakenBy(p))
+    {
+        if (_checkCoinBreakable(x, y, p))
+            pairUnbreakable = 0;
+        else
+            ++pairUnbreakable;
+
+        x -= dx;
+        y -= dy;
+    }
+
+    return pairUnbreakable >= 5;
+}
+
+bool Arbiter::_checkCoinBreakable(int x, int y, const Player *p) const
+{
+    for (int i = -1; i <= 1; ++i)
+        for (int j = -1; j <= 1; ++j)
+            if (i != 0 || j != 0)
+                if (_checkCoinCanBeTake(x, y, p, i, j))
+                    return true;
+
+    return false;
+}
+
+bool Arbiter::_checkCoinCanBeTake(int x, int y, const Player *p, int dx, int dy) const
+{
+    x -= dx;
+    y -= dy;
+
+    if (!_map->getSafe(x, y).isAlreadyTaken() || _map->getSafe(x, y).isAlreadyTakenBy(p))
+        return false;
+
+    x += 2 * dx;
+    y += 2 * dy;
+
+    if (!_map->getSafe(x, y).isAlreadyTakenBy(p))
+        return false;
+
+    x += dx;
+    y += dy;
+
+    if (_map->getSafe(x, y).isAlreadyTaken() || !Map::isValid(x, y))
         return false;
 
     return true;

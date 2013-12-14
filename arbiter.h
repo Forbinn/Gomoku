@@ -1,32 +1,50 @@
 #ifndef ARBITER_H
 #define ARBITER_H
 
-#include <QString>
+#include <QObject>
 
-#include "frame.h"
-#include "player.h"
+#include "map.h"
 #include "settings.h"
 
-class Arbiter
+#define NB_PAIR_FOR_WINNER  5
+
+class Arbiter : public QObject
 {
+    Q_OBJECT
+
 public:
-    Arbiter(const Frame *frame, const Settings *settings);
+    enum eErrorType
+    {
+        NO_ERROR        = 0,
+        ALREADY_TAKEN   = 1
+    };
+
+public:
+    Arbiter(Map *map, const Settings *settings, QObject *parent = NULL);
     virtual ~Arbiter();
 
-    bool isValid(int x, int y, const Player *p);
-    bool hasWin(const Player *p, int x, int y) const;
+    bool setCase(int x, int y, Player *p);
+    bool isValid(int x, int y, const Player *p) const;
 
-    inline QString errorString() const { return _errorString; }
-
-private:
-    bool _checkThisLine(int x, int y, const Player *p, int dx, int dy) const;
-    bool _lineIsBreakable(int x, int y, const Player *p, int dx, int dy) const;
-    bool _checkBreakableLine(int x, int y, const Player *p, int dx, int dy) const;
+    inline eErrorType lastError() const { return _errorType; }
+    QString lastErrorString() const;
 
 private:
-    const Frame *_frame;
+    int _checkAllPair(int x, int y, const Player *p);
+    bool _checkOnePair(int x, int y, const Player *p, int dx, int dy);
+    bool _checkFive(int x, int y, const Player *p) const;
+    bool _checkFiveOneLine(int x, int y, const Player *p, int dx, int dy) const;
+    bool _checkLineBreakable(int x, int y, const Player *p, int dx, int dy) const;
+    bool _checkCoinBreakable(int x, int y, const Player *p) const;
+    bool _checkCoinCanBeTake(int x, int y, const Player *p, int dx, int dy) const;
+
+private:
+    eErrorType _errorType;
+    Map *_map;
     const Settings *_settings;
-    QString _errorString;
+
+signals:
+    void winner(const Player *p);
 };
 
 #endif // ARBITER_H
