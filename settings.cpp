@@ -9,6 +9,9 @@ Settings::Settings(QWidget *parent) :
 {
     setupUi(this);
 
+    lePlayer1->setMaxLength(8);
+    lePlayer2->setMaxLength(8);
+
     _load();
     QObject::connect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(buttonBox_clicked(QAbstractButton*)));
 }

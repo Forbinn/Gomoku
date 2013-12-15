@@ -18,6 +18,7 @@ Game::Game(const Settings *settings, QWidget *parent) :
     QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked()));
     QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
     QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
+    QObject::connect(_arbiter, SIGNAL(playerTakePair(const Player*,int)), this, SLOT(_arbiter_playerTakePair(const Player*)));
     QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
 }
 
@@ -32,6 +33,7 @@ void Game::setPlayer1(Player *p1)
 
     _p1 = p1;
     _gameboard->setPlayer1(p1);
+    labelPlayer1->setText(_p1->name());
 
     QObject::connect(_p1, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
 }
@@ -43,6 +45,7 @@ void Game::setPlayer2(Player *p2)
 
     _p2 = p2;
     _gameboard->setPlayer2(p2);
+    labelPlayer2->setText(_p2->name());
 
     QObject::connect(_p2, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
 }
@@ -102,8 +105,24 @@ void Game::_gameboard_mouseMoved(const QPoint &p)
 
 void Game::_arbiter_winner(const Player *p)
 {
-    labelPlayerTurn->setText("Player " + p->name() + " is the winner");
+    labelPlayerTurn->setText("Player '" + p->name() + "' is the winner");
     _run = false;
+}
+
+void Game::_arbiter_playerTakePair(const Player *p)
+{
+    QList<QLabel*> list;
+
+    if (p == _p1)
+        list << coin111 << coin112 << coin121 << coin122 << coin131 << coin132 << coin141 << coin142 << coin151 << coin152;
+    else
+        list << coin211 << coin212 << coin221 << coin222 << coin231 << coin232 << coin241 << coin242 << coin251 << coin252;
+
+    for (int i = 0; i < p->pairTaken() * 2 && i < list.size(); i += 2)
+    {
+        list[i]->setPixmap(QPixmap::fromImage(p->image()));
+        list[i + 1]->setPixmap(*list[i]->pixmap());
+    }
 }
 
 void Game::_player_movePlayed(int x, int y)

@@ -45,6 +45,7 @@ private:
     const Settings *_settings;
 
 signals:
+    void playerTakePair(const Player *p, int nb);
     void winner(const Player *p);
 };
 

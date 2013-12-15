@@ -29,7 +29,14 @@ bool Arbiter::setCase(int x, int y, Player *p)
     }
 
     c.setOwner(p);
-    p->addPairTaken(_checkAllPair(x, y, p));
+
+    int pairTaken = _checkAllPair(x, y, p);
+    if (pairTaken > 0)
+    {
+        p->addPairTaken(pairTaken);
+        emit playerTakePair(p, pairTaken);
+    }
+
 
     if (p->pairTaken() >= NB_PAIR_FOR_WINNER)
         emit winner(p);

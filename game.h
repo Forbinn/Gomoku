@@ -42,6 +42,7 @@ private slots:
     void _gameboard_mouseClicked();
     void _gameboard_mouseMoved(const QPoint &p);
     void _arbiter_winner(const Player *p);
+    void _arbiter_playerTakePair(const Player *p);
     void _player_movePlayed(int x, int y);
 
 signals:
