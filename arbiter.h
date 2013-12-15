@@ -16,7 +16,8 @@ public:
     enum eErrorType
     {
         NO_ERROR        = 0,
-        ALREADY_TAKEN   = 1
+        ALREADY_TAKEN   = 1,
+        OUT_OF_BOUND    = 2
     };
 
 public:

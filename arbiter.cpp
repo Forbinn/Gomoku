@@ -14,6 +14,12 @@ Arbiter::~Arbiter()
 
 bool Arbiter::setCase(int x, int y, Player *p)
 {
+    if (x < 0 || x >= _map->width() || y < 0 || y >= _map->height())
+    {
+        _errorType = OUT_OF_BOUND;
+        return false;
+    }
+
     Case &c = _map->get(x, y);
 
     if (c.isAlreadyTaken())
@@ -37,6 +43,9 @@ bool Arbiter::setCase(int x, int y, Player *p)
 bool Arbiter::isValid(int x, int y, const Player *p) const
 {
     Q_UNUSED(p);
+    if (x < 0 || x >= _map->width() || y < 0 || y >= _map->height())
+        return false;
+
     Case &c = _map->get(x, y);
 
     if (c.isAlreadyTaken())
@@ -53,6 +62,8 @@ QString Arbiter::lastErrorString() const
             return "No error encountered";
         case ALREADY_TAKEN:
             return "This case is already taken";
+        case OUT_OF_BOUND:
+            return "Move played out of bound";
         default:
             return "Unknow error";
     }
