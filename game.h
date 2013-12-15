@@ -39,7 +39,8 @@ private:
     bool _run;
 
 private slots:
-    void _gameboard_mouseClicked(const QPoint &p);
+    void _gameboard_mouseClicked();
+    void _gameboard_mouseMoved(const QPoint &p);
     void _arbiter_winner(const Player *p);
     void _player_movePlayed(int x, int y);
 

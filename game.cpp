@@ -15,7 +15,8 @@ Game::Game(const Settings *settings, QWidget *parent) :
 
     gridLayout->addWidget(_gameboard, 1, 0, 1, -1);
 
-    QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked(QPoint)));
+    QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked()));
+    QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
     QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
     QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
 }
@@ -72,7 +73,17 @@ void Game::_switchPlayer()
     ai->start();
 }
 
-void Game::_gameboard_mouseClicked(const QPoint &p)
+void Game::_gameboard_mouseClicked()
+{
+    if (!_actuPlayer || !_run)
+        return ;
+    if (qobject_cast<AI*>(_actuPlayer))
+        return ;
+
+    _player_movePlayed(_gameboard->previewCase().x(), _gameboard->previewCase().y());
+}
+
+void Game::_gameboard_mouseMoved(const QPoint &p)
 {
     if (!_actuPlayer || !_run)
         return ;
@@ -82,7 +93,11 @@ void Game::_gameboard_mouseClicked(const QPoint &p)
     int posX = p.x() / _gameboard->caseWidth();
     int posY = p.y() / _gameboard->caseHeight();
 
-    _player_movePlayed(posX, posY);
+    if (!_arbiter->isValid(posX, posY, _actuPlayer))
+        return ;
+
+    _gameboard->setPosOfPreviewCase(posX, posY, _actuPlayer);
+    _gameboard->update();
 }
 
 void Game::_arbiter_winner(const Player *p)

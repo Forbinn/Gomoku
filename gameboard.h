@@ -27,6 +27,11 @@ public:
     inline int caseWidth() const { return this->width() / _map.width(); }
     inline int caseHeight() const { return this->height() / _map.height(); }
 
+    void setPosOfPreviewCase(int x, int y, Player *p);
+    inline const Case& previewCase() const { return _preview; }
+
+    virtual bool eventFilter(QObject *obj, QEvent *e);
+
 public slots:
     void reset();
 
@@ -35,12 +40,14 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *e);
 
 private:
+    Case _preview;
     const Player *_p1;
     const Player *_p2;
     Map _map;
 
 signals:
     void mouseClicked(const QPoint &p);
+    void mouseMoved(const QPoint &p);
 };
 
 #endif // GAMEBOARD_H

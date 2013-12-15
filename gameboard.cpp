@@ -1,19 +1,41 @@
 #include <QPainter>
 #include <QVector>
 #include <QLine>
+#include <QApplication>
 
 #include "gameboard.h"
 
 GameBoard::GameBoard(QWidget *parent) :
     QFrame(parent),
+    _preview(),
     _p1(NULL),
     _p2(NULL),
     _map()
 {
+    qApp->installEventFilter(this);
 }
 
 GameBoard::~GameBoard()
 {
+}
+
+void GameBoard::setPosOfPreviewCase(int x, int y, Player *p)
+{
+    _preview.setX(x);
+    _preview.setY(y);
+    _preview.setOwner(p);
+}
+
+bool GameBoard::eventFilter(QObject *obj, QEvent *e)
+{
+    if (obj == this && e->type() == QEvent::MouseMove)
+    {
+        QMouseEvent *event = static_cast<QMouseEvent*>(e);
+        emit mouseMoved(event->pos());
+        return true;
+    }
+
+    return qApp->eventFilter(obj, e);
 }
 
 void GameBoard::reset()
