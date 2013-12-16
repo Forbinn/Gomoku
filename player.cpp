@@ -29,3 +29,9 @@ bool Player::removeCase(const Case *c)
 
     return _cases.removeOne(c);
 }
+
+void Player::reset()
+{
+    _cases.clear();
+    _pairTaken = 0;
+}

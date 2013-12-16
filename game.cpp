@@ -72,9 +72,9 @@ void Game::reset()
     _gameboard->reset();
 
     if (_p1)
-        _p1->setPairTaken(0);
+        _p1->reset();
     if (_p2)
-        _p2->setPairTaken(0);
+        _p2->reset();
 
     foreach (PairWidget *pair, _listPairWidget1)
         delete pair;

@@ -31,6 +31,8 @@ public:
     inline void addPairTaken(int nb) { _pairTaken += nb; }
     inline void setPairTaken(int nb) { _pairTaken = nb; }
 
+    void reset();
+
 private:
     QString _name;
     QList<const Case*> _cases;
