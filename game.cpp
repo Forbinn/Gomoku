@@ -17,11 +17,14 @@ Game::Game(const Settings *settings, QWidget *parent) :
 
     gridLayout->addWidget(_gameboard, 1, 0, 1, -1);
 
+    pbNewGame->setVisible(false);
+
     QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked()));
     QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
     QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
     QObject::connect(_arbiter, SIGNAL(playerTakePair(const Player*,int)), this, SLOT(_arbiter_playerTakePair(const Player*,int)));
     QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
+    QObject::connect(pbNewGame, SIGNAL(clicked()), this, SLOT(reset()));
 }
 
 Game::~Game()
@@ -74,6 +77,7 @@ void Game::reset()
         delete pair;
     _listPairWidget1.clear();
     _listPairWidget2.clear();
+    pbNewGame->setVisible(false);
 }
 
 void Game::_switchPlayer()
@@ -123,6 +127,7 @@ void Game::_arbiter_winner(const Player *p)
 {
     labelPlayerTurn->setText("Player '" + p->name() + "' is the winner");
     _run = false;
+    pbNewGame->setVisible(true);
 }
 
 void Game::_arbiter_playerTakePair(const Player *p, int nb)
