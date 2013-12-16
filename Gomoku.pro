@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     gameboard.cpp \
     settings.cpp \
     arbiter.cpp \
-    ai.cpp
+    ai.cpp \
+    pairwidget.cpp
 
 HEADERS  += mainwindow.h \
     case.h \
@@ -33,7 +34,8 @@ HEADERS  += mainwindow.h \
     gameboard.h \
     settings.h \
     arbiter.h \
-    ai.h
+    ai.h \
+    pairwidget.h
 
 FORMS += \
     menu.ui \

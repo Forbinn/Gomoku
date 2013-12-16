@@ -9,6 +9,8 @@ Game::Game(const Settings *settings, QWidget *parent) :
     _p1(NULL),
     _p2(NULL),
     _actuPlayer(NULL),
+    _listPairWidget1(),
+    _listPairWidget2(),
     _run(false)
 {
     setupUi(this);
@@ -18,12 +20,16 @@ Game::Game(const Settings *settings, QWidget *parent) :
     QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked()));
     QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
     QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
-    QObject::connect(_arbiter, SIGNAL(playerTakePair(const Player*,int)), this, SLOT(_arbiter_playerTakePair(const Player*)));
+    QObject::connect(_arbiter, SIGNAL(playerTakePair(const Player*,int)), this, SLOT(_arbiter_playerTakePair(const Player*,int)));
     QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
 }
 
 Game::~Game()
 {
+    foreach (PairWidget *pair, _listPairWidget1)
+        delete pair;
+    foreach (PairWidget *pair, _listPairWidget2)
+        delete pair;
 }
 
 void Game::setPlayer1(Player *p1)
@@ -54,10 +60,20 @@ void Game::reset()
 {
     _actuPlayer = _p1;
 
-    labelPlayerTurn->setText(_actuPlayer->name() + " is your turn");
-    iconPlayer->setPixmap(QPixmap::fromImage(_actuPlayer->image()));
+    if (_actuPlayer)
+    {
+        labelPlayerTurn->setText(_actuPlayer->name() + " is your turn");
+        iconPlayer->setPixmap(QPixmap::fromImage(_actuPlayer->image()));
+    }
     _run = true;
     _gameboard->reset();
+
+    foreach (PairWidget *pair, _listPairWidget1)
+        delete pair;
+    foreach (PairWidget *pair, _listPairWidget2)
+        delete pair;
+    _listPairWidget1.clear();
+    _listPairWidget2.clear();
 }
 
 void Game::_switchPlayer()
@@ -109,19 +125,27 @@ void Game::_arbiter_winner(const Player *p)
     _run = false;
 }
 
-void Game::_arbiter_playerTakePair(const Player *p)
+void Game::_arbiter_playerTakePair(const Player *p, int nb)
 {
-    QList<QLabel*> list;
+    PairWidget *pairWidget;
 
     if (p == _p1)
-        list << coin111 << coin112 << coin121 << coin122 << coin131 << coin132 << coin141 << coin142 << coin151 << coin152;
-    else
-        list << coin211 << coin212 << coin221 << coin222 << coin231 << coin232 << coin241 << coin242 << coin251 << coin252;
-
-    for (int i = 0; i < p->pairTaken() * 2 && i < list.size(); i += 2)
     {
-        list[i]->setPixmap(QPixmap::fromImage(p->image()));
-        list[i + 1]->setPixmap(*list[i]->pixmap());
+        for (int i = 0; i < nb; ++i)
+        {
+            pairWidget = new PairWidget(_p2, this);
+            _listPairWidget1 << pairWidget;
+            layPair1->addWidget(pairWidget);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < nb; ++i)
+        {
+            pairWidget = new PairWidget(_p1, this);
+            _listPairWidget2 << pairWidget;
+            layPair2->addWidget(pairWidget);
+        }
     }
 }
 

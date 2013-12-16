@@ -2,11 +2,13 @@
 #define GAME_H
 
 #include <QWidget>
+#include <QList>
 
 #include "ui_game.h"
 #include "gameboard.h"
 #include "player.h"
 #include "arbiter.h"
+#include "pairwidget.h"
 
 class Game : public QWidget, private Ui::Game
 {
@@ -36,13 +38,15 @@ private:
     Player *_p1;
     Player *_p2;
     Player *_actuPlayer;
+    QList<PairWidget*> _listPairWidget1;
+    QList<PairWidget*> _listPairWidget2;
     bool _run;
 
 private slots:
     void _gameboard_mouseClicked();
     void _gameboard_mouseMoved(const QPoint &p);
     void _arbiter_winner(const Player *p);
-    void _arbiter_playerTakePair(const Player *p);
+    void _arbiter_playerTakePair(const Player *p, int nb);
     void _player_movePlayed(int x, int y);
 
 signals:
