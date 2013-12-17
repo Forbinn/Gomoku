@@ -27,6 +27,9 @@ private:
     const Arbiter *_arbiter;
     const Map &_map;
     bool _run;
+
+signals:
+    void finished(int ms);
 };
 
 #endif // AI_H

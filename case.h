@@ -10,7 +10,9 @@ public:
     virtual ~Case();
 
     inline bool isAlreadyTaken() const { return _owner != NULL; }
+    inline bool isNotAlreadyTaken() const { return _owner == NULL; }
     inline bool isAlreadyTakenBy(const Player *p) const { return _owner == p; }
+    inline bool isNotAlreadyTakenBy(const Player *p) const { return _owner != p; }
 
     inline const Player* owner() const { return _owner; }
     inline Player* owner() { return _owner; }

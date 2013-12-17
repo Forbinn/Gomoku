@@ -30,6 +30,7 @@ public slots:
     void reset();
 
 private:
+    void _setPlayer(Player *newPlayer, Player *&oldPlayer);
     void _switchPlayer();
 
 private:
@@ -48,6 +49,7 @@ private slots:
     void _arbiter_winner(const Player *p);
     void _arbiter_playerTakePair(const Player *p, int nb);
     void _player_movePlayed(int x, int y);
+    void _ai_finished(int ms);
 
 signals:
     void menu();

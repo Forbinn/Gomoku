@@ -28,6 +28,13 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1">
+     <widget class="QLabel" name="iconPlayer">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="2">
      <widget class="QLabel" name="labelPlayerTurn">
       <property name="sizePolicy">
@@ -49,10 +56,17 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="iconPlayer">
+    <item row="0" column="3">
+     <widget class="QPushButton" name="pbNewGame">
       <property name="text">
-       <string>TextLabel</string>
+       <string>New game</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QLabel" name="labelAITime">
+      <property name="text">
+       <string>0 ms</string>
       </property>
      </widget>
     </item>
@@ -65,13 +79,6 @@
       </property>
       <property name="text">
        <string>&lt; Menu</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="pbNewGame">
-      <property name="text">
-       <string>New game</string>
       </property>
      </widget>
     </item>

@@ -18,6 +18,7 @@ Game::Game(const Settings *settings, QWidget *parent) :
     gridLayout->addWidget(_gameboard, 1, 0, 1, -1);
 
     pbNewGame->setVisible(false);
+    labelAITime->setVisible(false);
 
     QObject::connect(_gameboard, SIGNAL(mouseClicked(QPoint)), this, SLOT(_gameboard_mouseClicked()));
     QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
@@ -37,26 +38,16 @@ Game::~Game()
 
 void Game::setPlayer1(Player *p1)
 {
-    if (_p1)
-        QObject::disconnect(_p1, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
-
-    _p1 = p1;
+    _setPlayer(p1, _p1);
     _gameboard->setPlayer1(p1);
     labelPlayer1->setText(_p1->name());
-
-    QObject::connect(_p1, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
 }
 
 void Game::setPlayer2(Player *p2)
 {
-    if (_p2)
-        QObject::disconnect(_p2, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
-
-    _p2 = p2;
+    _setPlayer(p2, _p2);
     _gameboard->setPlayer2(p2);
     labelPlayer2->setText(_p2->name());
-
-    QObject::connect(_p2, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
 }
 
 void Game::reset()
@@ -83,6 +74,26 @@ void Game::reset()
     _listPairWidget1.clear();
     _listPairWidget2.clear();
     pbNewGame->setVisible(false);
+
+    labelAITime->setVisible(qobject_cast<AI*>(_p1) || qobject_cast<AI*>(_p2));
+}
+
+void Game::_setPlayer(Player *newPlayer, Player *&oldPlayer)
+{
+    if (oldPlayer)
+    {
+        QObject::disconnect(oldPlayer, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
+        AI *ai = qobject_cast<AI*>(oldPlayer);
+        if (ai)
+            QObject::disconnect(ai, SIGNAL(finished(int)), this, SLOT(_ai_finished(int)));
+    }
+
+    oldPlayer = newPlayer;
+
+    QObject::connect(oldPlayer, SIGNAL(movePlayed(int,int)), this, SLOT(_player_movePlayed(int,int)));
+    AI *ai = qobject_cast<AI*>(oldPlayer);
+    if (ai)
+        QObject::connect(ai, SIGNAL(finished(int)), this, SLOT(_ai_finished(int)));
 }
 
 void Game::_switchPlayer()
@@ -121,7 +132,7 @@ void Game::_gameboard_mouseMoved(const QPoint &p)
     int posX = p.x() / _gameboard->caseWidth();
     int posY = p.y() / _gameboard->caseHeight();
 
-    if (!_arbiter->isValid(posX, posY, _actuPlayer))
+    if (!_arbiter->isValidFast(posX, posY))
         return ;
 
     _gameboard->setPosOfPreviewCase(posX, posY, _actuPlayer);
@@ -170,4 +181,9 @@ void Game::_player_movePlayed(int x, int y)
     _gameboard->update();
     _switchPlayer();
     emit newMove();
+}
+
+void Game::_ai_finished(int ms)
+{
+    labelAITime->setText(QString::number(ms) + " ms");
 }

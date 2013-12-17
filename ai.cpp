@@ -1,3 +1,5 @@
+#include <QTime>
+
 #include "ai.h"
 
 AI::AI(const QString &name, const QString &imgPath, const Map &map, const Arbiter *arbiter) :
@@ -33,9 +35,11 @@ void AI::stop()
 
 void AI::run()
 {
+    QTime _time;
     int x = 0;
     int y = 0;
 
+    _time.start();
     while (!_arbiter->isValid(x, y, this))
     {
         ++x;
@@ -47,6 +51,7 @@ void AI::run()
         }
     }
 
+    emit finished(_time.elapsed());
     emit movePlayed(x, y);
     _thread->quit();
 }
