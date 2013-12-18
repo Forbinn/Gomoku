@@ -17,7 +17,8 @@ public:
     {
         NO_ERROR        = 0,
         ALREADY_TAKEN   = 1,
-        OUT_OF_BOUND    = 2
+        OUT_OF_BOUND    = 2,
+        DOUBLE_3        = 3
     };
 
 public:
@@ -26,18 +27,22 @@ public:
 
     bool setCase(int x, int y, Player *p);
     bool isValid(int x, int y, const Player *p) const;
+    bool isValidFast(int x, int y) const;
 
     inline eErrorType lastError() const { return _errorType; }
     QString lastErrorString() const;
 
 private:
-    int _checkAllPair(int x, int y, const Player *p);
-    bool _checkOnePair(int x, int y, const Player *p, int dx, int dy);
+    int _checkAllPairForRemove(int x, int y, const Player *p);
+    bool _checkOnePairForRemove(int x, int y, const Player *p, int dx, int dy);
     bool _checkFive(int x, int y, const Player *p) const;
     bool _checkFiveOneLine(int x, int y, const Player *p, int dx, int dy) const;
     bool _checkLineBreakable(int x, int y, const Player *p, int dx, int dy) const;
     bool _checkCoinBreakable(int x, int y, const Player *p) const;
     bool _checkCoinCanBeTake(int x, int y, const Player *p, int dx, int dy) const;
+    bool _checkDouble3(int x, int y, const Player *p) const;
+    bool _check3Free(int x, int y, const Player *p, int dx, int dy) const;
+    bool _checkDouble3Aux(int x, int y, const Player *p, int dx, int dy) const;
 
 private:
     eErrorType _errorType;
