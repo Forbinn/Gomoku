@@ -59,14 +59,15 @@ bool Arbiter::setCase(int x, int y, Player *p)
 
 bool Arbiter::isValid(int x, int y, const Player *p) const
 {
-    Q_UNUSED(p);
     if (x < 0 || x >= _map->width() || y < 0 || y >= _map->height())
         return false;
 
-    Case &c = _map->get(x, y);
-
-    if (c.isAlreadyTaken())
+    if (_map->get(x, y).isAlreadyTaken())
         return false;
+
+    if (_settings->double3())
+        if (_checkDouble3(x, y, p))
+            return false;
 
     return true;
 }
