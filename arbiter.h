@@ -48,6 +48,8 @@ private:
     eErrorType _errorType;
     Map *_map;
     const Settings *_settings;
+    int _setXPos;
+    int _setYPos;
 
 signals:
     void playerTakePair(const Player *p, int nb);

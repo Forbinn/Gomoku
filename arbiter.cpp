@@ -4,7 +4,9 @@ Arbiter::Arbiter(Map *map, const Settings *settings, QObject *parent) :
     QObject(parent),
     _errorType(NO_ERROR),
     _map(map),
-    _settings(settings)
+    _settings(settings),
+    _setXPos(0),
+    _setYPos(0)
 {
 }
 
@@ -28,6 +30,8 @@ bool Arbiter::setCase(int x, int y, Player *p)
         return false;
     }
 
+    _setXPos = x;
+    _setYPos = y;
     if (_settings->double3())
         if (_checkDouble3(x, y, p))
         {
@@ -265,6 +269,8 @@ bool Arbiter::_checkDouble3(int x, int y, const Player *p) const
 
 bool Arbiter::_check3Free(int x, int y, const Player *p, int dx, int dy) const
 {
+    int saveX = x;
+    int saveY = y;
     int nbOwnCase = 0;
 
     x -= dx;
@@ -288,20 +294,20 @@ bool Arbiter::_check3Free(int x, int y, const Player *p, int dx, int dy) const
 
         if (c.isNotAlreadyTakenBy(p) && c.isAlreadyTaken())
             return false;
-        else if (c.isAlreadyTakenBy(p))
+        else if (c.isAlreadyTakenBy(p) || (x == _setXPos && y == _setYPos))
             ++nbOwnCase;
 
         x += dx;
         y += dy;
 
-        if (nbOwnCase == 2)
+        if (nbOwnCase == 3)
             break;
     }
 
-    if (_map->getSafe(x, y).isAlreadyTaken() || !Map::isValid(x, y))
+    if (_map->getSafe(x, y).isAlreadyTaken() || !Map::isValid(x, y) || (x == saveX && y == saveY))
         return false;
 
-    return nbOwnCase == 2;
+    return nbOwnCase == 3;
 }
 
 bool Arbiter::_checkDouble3Aux(int x, int y, const Player *p, int dx, int dy) const
@@ -312,10 +318,7 @@ bool Arbiter::_checkDouble3Aux(int x, int y, const Player *p, int dx, int dy) co
             for (int k = -1; k <= 1; ++k)
                 if ((j != 0 || k != 0) && (j != dx || k != dy) && (j != -dx || k != -dy))
                     if (_check3Free(x, y, p, j, k))
-                    {
-                        qDebug("Double 3 detected: [%d - %d] = [%d - %d] <=> [%d - %d]", x, y, dx, dy, j, k);
                         return true;
-                    }
 
         x += dx;
         y += dy;
