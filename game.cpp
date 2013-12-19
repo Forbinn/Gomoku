@@ -101,7 +101,7 @@ void Game::_switchPlayer()
     if (!_run)
         return ;
 
-    //_actuPlayer = (_actuPlayer == _p1) ? _p2 : _p1;
+    _actuPlayer = (_actuPlayer == _p1) ? _p2 : _p1;
     labelPlayerTurn->setText(_actuPlayer->name() + " is your turn");
     iconPlayer->setPixmap(QPixmap::fromImage(_actuPlayer->image()));
 
