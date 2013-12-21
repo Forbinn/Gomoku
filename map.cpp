@@ -36,16 +36,16 @@ const Case& Map::getSafe(int x, int y) const
     return _map[_index(x, y)];
 }
 
-void Map::reset()
-{
-    for (int i = 0; i < _map.size(); ++i)
-        _map[i].clearOwner();
-}
-
 Case& Map::getSafe(int x, int y)
 {
     if (x < 0 || x >= NB_COLUMN || y < 0 || y >= NB_ROW)
         return _invalidCase;
 
     return _map[_index(x, y)];
+}
+
+void Map::reset()
+{
+    for (int i = 0; i < _map.size(); ++i)
+        _map[i].clearOwner();
 }

@@ -3,7 +3,8 @@
 Case::Case(Player *p /* = NULL */) :
     _owner(p),
     _x(0),
-    _y(0)
+    _y(0),
+    _enlighten(false)
 {
     if (!p)
         return ;
@@ -14,7 +15,8 @@ Case::Case(Player *p /* = NULL */) :
 Case::Case(const Case &other) :
     _owner(NULL),
     _x(0),
-    _y(0)
+    _y(0),
+    _enlighten(false)
 {
     Q_UNUSED(other);
 }
@@ -46,4 +48,5 @@ void Case::clearOwner()
 
     _owner->removeCase(this);
     _owner = NULL;
+    _enlighten = false;
 }

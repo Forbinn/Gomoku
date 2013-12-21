@@ -2,5 +2,7 @@
     <qresource prefix="/image">
         <file alias="blackCoin">ressource/blackCoin.png</file>
         <file alias="whiteCoin">ressource/whiteCoin.png</file>
+        <file alias="blackCoinEnlighten">ressource/blackCoinEnlighten.png</file>
+        <file alias="whiteCoinEnlighten">ressource/whiteCoinEnlighten.png</file>
     </qresource>
 </RCC>

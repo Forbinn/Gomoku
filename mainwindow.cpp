@@ -5,12 +5,12 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     _stackedWidget(new QStackedWidget(this)),
-    _p1(new Player("Player 1", ":/image/whiteCoin", this)),
-    _p2(new Player("Player 2", ":/image/blackCoin", this)),
+    _p1(new Player("Player 1", ":/image/whiteCoin", ":/image/whiteCoinEnlighten", this)),
+    _p2(new Player("Player 2", ":/image/blackCoin", ":/image/blackCoinEnlighten", this)),
     _settings(new Settings(this)),
     _menu(new Menu(this)),
     _game(new Game(_settings, this)),
-    _ai(new AI("AI", ":/image/blackCoin", _game->gameBoard()->map(), _game->arbiter()))
+    _ai(new AI("AI", ":/image/blackCoin", ":/image/blackCoinEnlighten", _game->gameBoard()->map(), _game->arbiter()))
 {
     this->setCentralWidget(_stackedWidget);
 

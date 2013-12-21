@@ -8,8 +8,6 @@
 #define NB_ROW      19
 #define NB_COLUMN   19
 
-class Arbiter;
-
 class Map
 {
 public:
@@ -17,7 +15,9 @@ public:
     virtual ~Map();
 
     inline const Case& get(int x, int y) const { return _map[_index(x, y)]; }
+    inline Case& get(int x, int y) { return _map[_index(x, y)]; }
     const Case& getSafe(int x, int y) const;
+    Case& getSafe(int x, int y);
 
     inline int width() const { return NB_COLUMN; }
     inline int height() const { return NB_ROW; }
@@ -31,15 +31,8 @@ private:
     static inline int _index(int x, int y) { return y * NB_COLUMN + x; }
 
 private:
-    inline Case& get(int x, int y) { return _map[_index(x, y)]; }
-    Case& getSafe(int x, int y);
-
-private:
     QVarLengthArray<Case, NB_COLUMN * NB_ROW> _map;
     Case _invalidCase;
-
-private:
-    friend class Arbiter;
 };
 
 #endif // MAP_H

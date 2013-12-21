@@ -13,7 +13,7 @@ class Player : public QObject
     Q_OBJECT
 
 public:
-    Player(const QString &name, const QString &imgPath, QObject *parent = NULL);
+    Player(const QString &name, const QString &imgPath, const QString &imgPathEnlighten, QObject *parent = NULL);
     virtual ~Player();
 
     inline const QString& name() const { return _name; }
@@ -26,6 +26,7 @@ public:
     bool removeCase(const Case *c);
 
     inline const QImage& image() const { return _img; }
+    inline const QImage& imageEnlighten() const { return _imgEnlighten; }
 
     inline int pairTaken() const { return _pairTaken; }
     inline void addPairTaken(int nb) { _pairTaken += nb; }
@@ -37,6 +38,7 @@ private:
     QString _name;
     QList<const Case*> _cases;
     QImage _img;
+    QImage _imgEnlighten;
     int _pairTaken;
 
 signals:

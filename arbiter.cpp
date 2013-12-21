@@ -1,12 +1,13 @@
 #include "arbiter.h"
 
+int Arbiter::_setXPos = 0;
+int Arbiter::_setYPos = 0;
+
 Arbiter::Arbiter(Map *map, const Settings *settings, QObject *parent) :
     QObject(parent),
     _errorType(NO_ERROR),
     _map(map),
-    _settings(settings),
-    _setXPos(0),
-    _setYPos(0)
+    _settings(settings)
 {
 }
 
@@ -30,8 +31,6 @@ bool Arbiter::setCase(int x, int y, Player *p)
         return false;
     }
 
-    _setXPos = x;
-    _setYPos = y;
     if (_settings->double3())
         if (_checkDouble3(x, y, p))
         {
@@ -247,23 +246,31 @@ bool Arbiter::_checkCoinCanBeTake(int x, int y, const Player *p, int dx, int dy)
 
 bool Arbiter::_checkDouble3(int x, int y, const Player *p) const
 {
+    Arbiter::_setXPos = x;
+    Arbiter::_setYPos = y;
+
     for (int i = -1; i <= 1; ++i)
         for (int j = -1; j <= 1; ++j)
             if (i != 0 || j != 0)
+            {
+                x = Arbiter::_setXPos - i;
+                y = Arbiter::_setYPos - j;
+
+                while (_map->getSafe(x, y).isAlreadyTakenBy(p))
+                {
+                    x -= i;
+                    y -= j;
+                }
+
                 if (_check3Free(x, y, p, i, j))
                 {
-                    while (_map->getSafe(x, y).isAlreadyTakenBy(p))
-                    {
-                        x -= i;
-                        y -= j;
-                    }
-
                     x += i;
                     y += j;
 
                     if (_checkDouble3Aux(x, y, p, i, j))
                         return true;
                 }
+            }
 
     return false;
 }
@@ -273,15 +280,6 @@ bool Arbiter::_check3Free(int x, int y, const Player *p, int dx, int dy) const
     int saveX = x;
     int saveY = y;
     int nbOwnCase = 0;
-
-    x -= dx;
-    y -= dy;
-
-    while (_map->getSafe(x, y).isAlreadyTakenBy(p))
-    {
-        x -= dx;
-        y -= dy;
-    }
 
     if (_map->getSafe(x, y).isAlreadyTaken() || !Map::isValid(x, y))
         return false;
@@ -295,7 +293,7 @@ bool Arbiter::_check3Free(int x, int y, const Player *p, int dx, int dy) const
 
         if (c.isNotAlreadyTakenBy(p) && c.isAlreadyTaken())
             return false;
-        else if (c.isAlreadyTakenBy(p) || (x == _setXPos && y == _setYPos))
+        else if (c.isAlreadyTakenBy(p) || (x == Arbiter::_setXPos && y == Arbiter::_setYPos))
             ++nbOwnCase;
 
         x += dx;
@@ -313,13 +311,36 @@ bool Arbiter::_check3Free(int x, int y, const Player *p, int dx, int dy) const
 
 bool Arbiter::_checkDouble3Aux(int x, int y, const Player *p, int dx, int dy) const
 {
+    int firstX = x;
+    int firstY = y;
+
     for (int i = 0; i < 4; ++i)
     {
+        int saveX = x;
+        int saveY = y;
+
         for (int j = -1; j <= 1; ++j)
             for (int k = -1; k <= 1; ++k)
                 if ((j != 0 || k != 0) && (j != dx || k != dy) && (j != -dx || k != -dy))
+                {
+                    x = saveX;
+                    y = saveY;
+
+                    while (_map->getSafe(x, y).isAlreadyTakenBy(p) || (x == Arbiter::_setXPos && y == Arbiter::_setYPos))
+                    {
+                        x -= j;
+                        y -= k;
+                    }
+
                     if (_check3Free(x, y, p, j, k))
+                    {
+                        x += j;
+                        y += k;
+
+                        emit doubleThree(firstX, firstY, dx, dy, x, y, j, k);
                         return true;
+                    }
+                }
 
         x += dx;
         y += dy;

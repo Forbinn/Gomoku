@@ -1,4 +1,3 @@
-#include <QPainter>
 #include <QVector>
 #include <QLine>
 #include <QApplication>
@@ -71,22 +70,8 @@ void GameBoard::paintEvent(QPaintEvent *e)
     painter.begin(this);
     painter.drawLines(lines);
 
-    if (_p1)
-        foreach (const Case *c, _p1->caseOwn())
-        {
-            int x = (c->x() + 1) * lineSpaceWidth - _p1->image().width() / 2;
-            int y = (c->y() + 1) * lineSpaceHeight - _p1->image().height() / 2;
-
-            painter.drawImage(x, y, _p1->image());
-        }
-    if (_p2)
-        foreach (const Case *c, _p2->caseOwn())
-        {
-            int x = (c->x() + 1) * lineSpaceWidth - _p2->image().width() / 2;
-            int y = (c->y() + 1) * lineSpaceHeight - _p2->image().height() / 2;
-
-            painter.drawImage(x, y, _p2->image());
-        }
+    _drawImage(_p1, painter, lineSpaceWidth, lineSpaceHeight);
+    _drawImage(_p2, painter, lineSpaceWidth, lineSpaceHeight);
 
     painter.end();
 
@@ -97,4 +82,20 @@ void GameBoard::mouseReleaseEvent(QMouseEvent *e)
 {
     emit mouseClicked(e->pos());
     QFrame::mouseReleaseEvent(e);
+}
+
+void GameBoard::_drawImage(const Player *p, QPainter &painter, int lineSpaceWidth, int lineSpaceHeight)
+{
+    if (!p)
+        return ;
+
+    foreach (const Case *c, p->caseOwn())
+    {
+        const QImage &img = c->isEnlighten() ? p->imageEnlighten() : p->image();
+
+        int x = ((c->x() + 1) * lineSpaceWidth) - (img.width() / 2);
+        int y = ((c->y() + 1) * lineSpaceHeight) - (img.height() / 2);
+
+        painter.drawImage(x, y, img);
+    }
 }

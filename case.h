@@ -25,6 +25,9 @@ public:
     inline int y() const { return _y; }
     inline void setY(int y) { _y = y; }
 
+    inline bool isEnlighten() const { return _enlighten; }
+    inline void setEnlighten(bool enlighten) { _enlighten = enlighten; }
+
 private:
     Case(const Case &other);
     Case& operator=(const Case &other);
@@ -33,6 +36,7 @@ private:
     Player *_owner;
     int _x;
     int _y;
+    bool _enlighten;
 };
 
 #endif // CASE_H

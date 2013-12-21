@@ -12,7 +12,7 @@ class AI : public Player
     Q_OBJECT
 
 public:
-    AI(const QString &name, const QString &imgPath, const Map &map, const Arbiter *arbiter);
+    AI(const QString &name, const QString &imgPath, const QString &imgPathEnlighten, const Map &map, const Arbiter *arbiter);
     virtual ~AI();
 
     inline bool isRunning() const { return _run; }

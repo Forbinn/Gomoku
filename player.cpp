@@ -1,10 +1,11 @@
 #include "player.h"
 
-Player::Player(const QString &name, const QString &imgPath, QObject *parent) :
+Player::Player(const QString &name, const QString &imgPath, const QString &imgPathEnlighten, QObject *parent) :
     QObject(parent),
     _name(name),
     _cases(),
     _img(imgPath, NULL),
+    _imgEnlighten(imgPathEnlighten, NULL),
     _pairTaken(0)
 {
 }

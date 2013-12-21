@@ -1,3 +1,5 @@
+#include <QTimer>
+
 #include "ai.h"
 #include "game.h"
 
@@ -24,6 +26,7 @@ Game::Game(const Settings *settings, QWidget *parent) :
     QObject::connect(_gameboard, SIGNAL(mouseMoved(QPoint)), this, SLOT(_gameboard_mouseMoved(QPoint)));
     QObject::connect(_arbiter, SIGNAL(winner(const Player*)), this, SLOT(_arbiter_winner(const Player*)));
     QObject::connect(_arbiter, SIGNAL(playerTakePair(const Player*,int)), this, SLOT(_arbiter_playerTakePair(const Player*,int)));
+    QObject::connect(_arbiter, SIGNAL(doubleThree(int,int,int,int,int,int,int,int)), this, SLOT(_arbiter_doubleThree(int,int,int,int,int,int,int,int)));
     QObject::connect(pbMenu, SIGNAL(clicked()), this, SIGNAL(menu()));
     QObject::connect(pbNewGame, SIGNAL(clicked()), this, SLOT(reset()));
 }
@@ -170,6 +173,38 @@ void Game::_arbiter_playerTakePair(const Player *p, int nb)
     }
 }
 
+void Game::_arbiter_doubleThree(int x1, int y1, int dx1, int dy1, int x2, int y2, int dx2, int dy2)
+{
+    int nbCaseEnlighten = 0;
+
+    for (int i = 0; i < 4 && nbCaseEnlighten < 3; ++i)
+    {
+        if (_gameboard->map().get(x1, y1).isAlreadyTaken())
+        {
+            _gameboard->map().get(x1, y1).setEnlighten(true);
+            ++nbCaseEnlighten;
+        }
+
+        x1 += dx1;
+        y1 += dy1;
+    }
+
+    nbCaseEnlighten = 0;
+    for (int i = 0; i < 4 && nbCaseEnlighten < 3; ++i)
+    {
+        if (_gameboard->map().get(x2, y2).isAlreadyTaken())
+        {
+            _gameboard->map().get(x2, y2).setEnlighten(true);
+            ++nbCaseEnlighten;
+        }
+
+        x2 += dx2;
+        y2 += dy2;
+    }
+
+    QTimer::singleShot(3000, this, SLOT(_removeEnlighten()));
+}
+
 void Game::_player_movePlayed(int x, int y)
 {
     if (!_arbiter->setCase(x, y, _actuPlayer))
@@ -180,10 +215,18 @@ void Game::_player_movePlayed(int x, int y)
 
     _gameboard->update();
     _switchPlayer();
+    _removeEnlighten();
     emit newMove();
 }
 
 void Game::_ai_finished(int ms)
 {
     labelAITime->setText(QString::number(ms) + " ms");
+}
+
+void Game::_removeEnlighten()
+{
+    for (int i = 0; i < _gameboard->map().width(); ++i)
+        for (int j = 0; j < _gameboard->map().height(); ++j)
+            _gameboard->map().get(i, j).setEnlighten(false);
 }

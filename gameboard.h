@@ -4,6 +4,7 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include <QFrame>
+#include <QPainter>
 
 #include "player.h"
 #include "map.h"
@@ -38,6 +39,9 @@ public slots:
 protected:
     virtual void paintEvent(QPaintEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
+
+private:
+    void _drawImage(const Player *p, QPainter &painter, int lineSpaceWidth, int lineSpaceHeight);
 
 private:
     Case _preview;

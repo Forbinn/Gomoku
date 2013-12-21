@@ -48,12 +48,15 @@ private:
     eErrorType _errorType;
     Map *_map;
     const Settings *_settings;
-    int _setXPos;
-    int _setYPos;
+
+private:
+    static int _setXPos;
+    static int _setYPos;
 
 signals:
     void playerTakePair(const Player *p, int nb);
     void winner(const Player *p);
+    void doubleThree(int x1, int y1, int dx1, int dy1, int x2, int y2, int dx2, int dy2) const;
 };
 
 #endif // ARBITER_H

@@ -2,8 +2,8 @@
 
 #include "ai.h"
 
-AI::AI(const QString &name, const QString &imgPath, const Map &map, const Arbiter *arbiter) :
-    Player(name, imgPath),
+AI::AI(const QString &name, const QString &imgPath, const QString &imgPathEnlighten, const Map &map, const Arbiter *arbiter) :
+    Player(name, imgPath, imgPathEnlighten),
     _thread(new QThread(this)),
     _arbiter(arbiter),
     _map(map),
