@@ -203,6 +203,7 @@ void Game::_arbiter_doubleThree(int x1, int y1, int dx1, int dy1, int x2, int y2
     }
 
     QTimer::singleShot(3000, this, SLOT(_removeEnlighten()));
+    _gameboard->update();
 }
 
 void Game::_player_movePlayed(int x, int y)
@@ -213,9 +214,8 @@ void Game::_player_movePlayed(int x, int y)
         return ;
     }
 
-    _gameboard->update();
-    _switchPlayer();
     _removeEnlighten();
+    _switchPlayer();
     emit newMove();
 }
 
@@ -229,4 +229,5 @@ void Game::_removeEnlighten()
     for (int i = 0; i < _gameboard->map().width(); ++i)
         for (int j = 0; j < _gameboard->map().height(); ++j)
             _gameboard->map().get(i, j).setEnlighten(false);
+    _gameboard->update();
 }
