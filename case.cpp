@@ -4,7 +4,8 @@ Case::Case(Player *p /* = NULL */) :
     _owner(p),
     _x(0),
     _y(0),
-    _enlighten(false)
+    _enlighten(false),
+    _valor(0)
 {
     if (!p)
         return ;

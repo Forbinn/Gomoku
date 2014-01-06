@@ -24,6 +24,7 @@ public:
     void setPlayer2(Player *p2);
 
     inline const GameBoard* gameBoard() const { return _gameboard; }
+    inline GameBoard* gameBoard() { return _gameboard; }
     inline const Arbiter* arbiter() const { return _arbiter; }
 
 public slots:

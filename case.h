@@ -28,6 +28,9 @@ public:
     inline bool isEnlighten() const { return _enlighten; }
     inline void setEnlighten(bool enlighten) { _enlighten = enlighten; }
 
+    inline int valor() const { return _valor; }
+    inline void setValor(int valor) { _valor = valor; }
+
 private:
     Case(const Case &other);
     Case& operator=(const Case &other);
@@ -37,6 +40,7 @@ private:
     int _x;
     int _y;
     bool _enlighten;
+    int _valor;
 };
 
 #endif // CASE_H
